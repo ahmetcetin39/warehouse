@@ -1,21 +1,22 @@
-FROM maven:3.6.3-jdk-11-slim
+# BUILD STAGE
+FROM maven:3.6.3-jdk-11-slim as MAVEN_BUILD
 
-# Copy all files into container
-COPY . /
+MAINTAINER Ahmet Cetin
 
-# Build maven project
+COPY pom.xml /build/
+COPY src /build/src/
+
+WORKDIR /build/
+
 RUN mvn clean install
 
-# Refer to jar that maven built
-ARG JAR_FILE=target/warehouse-0.0.1.jar
+# RUN STAGE
+FROM openjdk:11-jre-slim
 
-# cd /opt/app
-WORKDIR /opt/app
+WORKDIR /app
 
-# cp target/warehouse-0.0.1.jar /opt/app/app.jar
-COPY ${JAR_FILE} app.jar
+COPY --from=MAVEN_BUILD /build/target/warehouse-0.0.1.jar /app/
 
 EXPOSE 8080
 
-# java -jar /opt/app/app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java","-jar","warehouse-0.0.1.jar"]
