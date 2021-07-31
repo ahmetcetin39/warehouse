@@ -26,7 +26,6 @@ If we do, then we make the sell operation and decrease the stock for articles wh
  
 
 ## How to run?
-This is a Spring Boot application, therefore if you want to run in on your local machine you can install Java 11 and Maven and do following:
 
 #### Option 1 (Best option):
 Run the application with docker (requires docker installation), it will run in a container, you will not need to install Java and Maven to your local machine.
@@ -36,9 +35,11 @@ Just run:
     `docker-compose up`
 
 #### Option 2:
-Run application as Spring Boot application from an EDI (IntelliJ etc.)
+Install Java 11 and Maven and then run application as Spring Boot application from an EDI (IntelliJ etc.)
 
 #### Option 3:
+Install Java11 and Maven and then:
+
 - Build (This will generate the _**jar**_ file):
 
     `mvn clean install`
