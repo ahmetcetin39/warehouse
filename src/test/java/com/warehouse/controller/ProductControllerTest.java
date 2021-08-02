@@ -79,18 +79,18 @@ class ProductControllerTest {
     }
 
     @Test
-    void add_whenFileCorrupted_thenGetInternalServerError() throws Exception {
+    void add_whenFileCorrupted_thenGetBadRequest() throws Exception {
         String content = Files.readString(Paths.get("src/test/resources/products.json"), StandardCharsets.UTF_8);
         content = "corruptedData" + content;
 
         mockMvc.perform(multipart(RESOURCE_PRODUCTS).file("productsFile", content.getBytes()))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void add_whenFileNotGiven_thenGetBadRequest() throws Exception {
+    void add_whenFileNotGiven_thenUnsupportedMediaType() throws Exception {
         mockMvc.perform(post(RESOURCE_PRODUCTS))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnsupportedMediaType());
     }
 
     @Test
@@ -107,6 +107,6 @@ class ProductControllerTest {
     @Test
     void sell_whenProductSold_thenGetNoContent() throws Exception {
         mockMvc.perform(patch(RESOURCE_PRODUCTS + "/{id}", 1))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 }

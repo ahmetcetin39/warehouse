@@ -64,7 +64,7 @@ class ArticleControllerTest {
     }
 
     @Test
-    void add_whenFileCorrupted_thenGetInternalServerError() throws Exception {
+    void add_whenFileCorrupted_thenGetBadRequest() throws Exception {
         String content = Files.readString(Paths.get("src/test/resources/inventory.json"), StandardCharsets.UTF_8);
         content = "corruptedData" + content;
 
@@ -76,7 +76,7 @@ class ArticleControllerTest {
         });
 
         mockMvc.perform(builder.file("articlesFile", content.getBytes()))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
