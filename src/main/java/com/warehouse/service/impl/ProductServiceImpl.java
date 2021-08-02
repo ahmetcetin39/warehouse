@@ -41,8 +41,19 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public List<Product> save(List<Product> products) {
-        products = productRepository.saveAll(products);
-        saveProductParts(products);
+        List<String> productNames = products.stream()
+                .map(Product::getName)
+                .collect(Collectors.toList());
+
+        List<String> existingProductsByName = productRepository.findAllByNameIn(productNames)
+                .stream().map(Product::getName).collect(Collectors.toList());
+
+        List<Product> productsToSave = products.stream()
+                .filter(product -> !existingProductsByName.contains(product.getName()))
+                .collect(Collectors.toList());
+
+        products = productRepository.saveAll(productsToSave);
+        saveProductParts(productsToSave);
         log.info("Saved new products: {}", products);
         return products;
     }
@@ -70,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void sellProduct(Long id) {
+    public synchronized void sellProduct(Long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isEmpty()) {
             log.warn("Product not found to sell with id: {}!", id);
