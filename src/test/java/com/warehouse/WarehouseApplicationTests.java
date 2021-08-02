@@ -142,7 +142,7 @@ class WarehouseApplicationTests {
                 .andExpect(jsonPath("$[1].count", is(1)));
 
         mockMvc.perform(patch(RESOURCE_PRODUCTS + "/{id}", 1))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
         // Get available products, should be 0. No articles added.
         mockMvc.perform(get(RESOURCE_PRODUCTS)

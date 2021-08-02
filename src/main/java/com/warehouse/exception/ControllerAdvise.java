@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartException;
 public class ControllerAdvise {
     @ExceptionHandler(FileProcessException.class)
     public ResponseEntity<String> handleFileProcessException(FileProcessException e) {
-        return ResponseEntity.internalServerError().body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler({ProductNotFoundException.class, ProductNotAvailableException.class})

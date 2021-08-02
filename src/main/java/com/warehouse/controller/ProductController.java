@@ -6,9 +6,13 @@ import com.warehouse.model.ProductBase;
 import com.warehouse.model.Products;
 import com.warehouse.model.entity.Product;
 import com.warehouse.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -38,12 +42,23 @@ public class ProductController {
     private final ObjectMapper objectMapper;
 
     @GetMapping
-    public ResponseEntity<List<? extends ProductBase>> get(@RequestParam(required = false) boolean isAvailable) {
+    @Operation(summary = "Get products")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Found products"))
+    public ResponseEntity<List<? extends ProductBase>> get(@Parameter(description = "To get the available products only")
+                                                           @RequestParam(required = false) boolean isAvailable) {
         return ResponseEntity.ok(isAvailable ? productService.getAvailableOnly() : productService.getAll());
     }
 
-    @PostMapping // It is a POST, because we are creating the Product resources
-    public ResponseEntity<List<Product>> save(@RequestParam("productsFile") MultipartFile productsFile) {
+    // It is a POST, because we are creating the Product resources
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "Save new products")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Saved products"),
+            @ApiResponse(responseCode = "400", description = "Couldn't process the file"),
+            @ApiResponse(responseCode = "415", description = "Unsupported media type")
+    })
+    public ResponseEntity<List<Product>> save(@Parameter(description = "File which contains products to save")
+                                              @RequestParam("productsFile") MultipartFile productsFile) {
         try {
             String productsAsString = new String(productsFile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             Products products = objectMapper.readValue(productsAsString, Products.class);
@@ -54,9 +69,16 @@ public class ProductController {
         }
     }
 
+    @Operation(summary = "Sell a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sold product"),
+            @ApiResponse(responseCode = "400", description = "Couldn't process the file"),
+            @ApiResponse(responseCode = "404", description = "Not available product found to sell")
+    })
     @PatchMapping("/{id}") // It is a PATCH, because we are updating the resource partially
-    public ResponseEntity sell(@PathVariable Long id) {
+    public ResponseEntity<Long> sell(@Parameter(description = "id of the product to sell")
+                                     @PathVariable Long id) {
         productService.sellProduct(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(id);
     }
 }

@@ -32,7 +32,7 @@ Run the application with docker (requires docker installation), it will run in a
 
 Just run:
  
-    `docker-compose up`
+    docker-compose up
 
 #### Option 2:
 Install Java 11 and Maven and then run application as Spring Boot application from an EDI (IntelliJ etc.)
@@ -55,7 +55,7 @@ Maven build operation already run the `mvn clean install`, you can run this comm
 
 To run the tests only:
 
-    `mvn test`
+    mvn test
 
 Test coverage:
 
